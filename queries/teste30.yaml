@@ -1,0 +1,7 @@
+ambiente: HOMOLOG
+autor: Rafael Dias
+data: '2025-10-15'
+motivo: TESTE
+query: SELECT * FROM VENDA
+rollback: NAO TEM
+titulo: teste30
