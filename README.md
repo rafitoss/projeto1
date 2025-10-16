@@ -1,4 +1,4 @@
-# como iniciar o projeto
+# Como iniciar o projeto
 
 ### Passo 1 - Instalar Git
 ### Passo 2 - Clonar repositorios
