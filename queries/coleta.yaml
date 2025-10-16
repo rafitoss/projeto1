@@ -1,0 +1,7 @@
+ambiente: Produção
+autor: Rafael Dias
+data: '2025-10-15'
+motivo: Validacao
+query: SELECT * FROM COLETA
+rollback: Não tem
+titulo: Coleta
