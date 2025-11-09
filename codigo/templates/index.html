@@ -39,12 +39,14 @@
   </script>
 </head>
 
-<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200 bg-[length:200%_200%] animate-gradient text-gray-800 transition-colors duration-300 relative overflow-hidden">
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 bg-[length:200%_200%] animate-gradient text-gray-800 dark:text-gray-100 transition-colors duration-300 relative overflow-hidden">
 
-  <!-- 🌙 Alternar modo escuro -->
-  <button id="toggleDark" class="fixed top-5 right-5 backdrop-blur-md bg-white/70 dark:bg-gray-800 dark:text-gray-100 px-3 py-1 rounded-lg shadow text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">
-    🌙
-  </button>
+<!-- 🌙 Alternar modo escuro (sempre visível em todas as telas) -->
+<button id="toggleDark"
+  class="fixed top-5 right-5 z-[9999] backdrop-blur-md bg-white/70 dark:bg-gray-800 dark:text-gray-100 px-3 py-1 rounded-lg shadow text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300">
+  🌙
+</button>
+
 
   <!-- 🔐 Tela de Login -->
   <div id="loginScreen" class="flex items-center justify-center min-h-screen animate-fadeIn">
@@ -72,7 +74,7 @@
 
   <!-- 🧭 Tela de Menu Principal -->
   <div id="menuPrincipalScreen" class="hidden flex flex-col justify-center items-center min-h-screen animate-fadeIn">
-    <h1 class="text-5xl font-extrabold text-primary mb-10 animate-glow text-center">Bem-vindo ao Sistema 💫</h1>
+    <h1 class="text-5xl font-extrabold text-primary dark:text-blue-400 mb-10 animate-glow text-center">Bem-vindo ao Sistema 💫</h1>
     <div class="flex flex-col gap-6">
       <button id="btnMenuQuery" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-10 py-4 rounded-2xl shadow-xl hover:scale-105 hover:shadow-[0_0_20px_#2563eb] transition-all">
         💾 Gerenciar Queries
@@ -100,10 +102,21 @@
   </div>
 
   <script>
-    // 🌙 Tema escuro
-    document.getElementById("toggleDark").addEventListener("click", () => {
-      document.documentElement.classList.toggle("dark");
+    // 🌙 Tema escuro com persistência
+    const htmlEl = document.documentElement;
+    const toggleBtn = document.getElementById("toggleDark");
+
+    if (localStorage.getItem("tema") === "dark") {
+      htmlEl.classList.add("dark");
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      htmlEl.classList.toggle("dark");
+      const isDark = htmlEl.classList.contains("dark");
+      localStorage.setItem("tema", isDark ? "dark" : "light");
     });
+
+    // --- Restante do código original ---
 
     const loginForm = document.getElementById('loginForm');
     const loginScreen = document.getElementById('loginScreen');
@@ -172,6 +185,7 @@
       loginScreen.classList.add("hidden");
       menuPrincipalScreen.classList.remove("hidden");
     }
+
 
     // LISTA
     async function abrirTela(tipo) {
@@ -268,37 +282,103 @@
       attachFormEvents(tipo);
     }
 
-    const formQueryHTML = () => `
-      <form id="queryForm" class="space-y-4 animate-fadeIn">
-        <input type="text" name="titulo" placeholder="Título" required class="w-full border rounded px-3 py-2">
-        <textarea name="query" placeholder="SQL" rows="5" required class="w-full border rounded px-3 py-2"></textarea>
-        <input type="text" name="motivo" placeholder="Motivo" required class="w-full border rounded px-3 py-2">
-        <input type="text" name="ambiente" placeholder="Ambiente" required class="w-full border rounded px-3 py-2">
-        <input type="text" name="rollback" placeholder="Rollback" class="w-full border rounded px-3 py-2">
-        <input type="text" name="autor" placeholder="Autor" required class="w-full border rounded px-3 py-2">
-        <button type="submit" class="bg-gradient-to-r from-primary to-blue-600 text-white w-full py-2 rounded-lg hover:scale-105 hover:shadow-lg transition">Salvar Query</button>
-      </form>
-    `;
+const formQueryHTML = () => `
+  <form id="queryForm" class="space-y-4 animate-fadeIn">
+    <!-- Título -->
+    <input type="text" name="titulo" placeholder="Título" required
+      class="w-full border rounded px-3 py-2">
 
-    const formProcessoHTML = () => `
-      <form id="processoForm" class="space-y-4 animate-fadeIn">
-        <input type="text" name="titulo" placeholder="Título" required class="w-full border rounded px-3 py-2">
-        <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Servidor</label>
-        <select name="servidor" required class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
-          <option value="">Selecione o servidor...</option>
-          <option value="PRODUCAO">PRODUÇÃO</option>
-          <option value="HOMOLOGACAO">HOMOLOGAÇÃO</option>
-          <option value="DESENVOLVIMENTO">DESENVOLVIMENTO</option>
-          <option value="TESTE">TESTE</option>
-        </select>
-        <div>
-          <label class="block font-medium text-gray-700 dark:text-gray-200">Etapas</label>
-          <div id="etapasContainer" class="space-y-2"></div>
-          <button type="button" id="addEtapa" class="bg-gradient-to-r from-secondary to-green-600 text-white px-4 py-2 rounded-lg hover:scale-105 hover:shadow-md transition">➕ Adicionar Etapa</button>
-        </div>
-        <button type="submit" class="bg-gradient-to-r from-primary to-blue-600 text-white w-full py-2 rounded-lg hover:scale-105 hover:shadow-lg transition">Salvar Processo</button>
-      </form>
-    `;
+    <!-- Query SQL -->
+    <textarea name="query" placeholder="SQL" rows="5" required
+      class="w-full border rounded px-3 py-2"></textarea>
+
+    <!-- Motivo -->
+    <input type="text" name="motivo" placeholder="Motivo" required
+      class="w-full border rounded px-3 py-2">
+
+    <!-- Ambiente -->
+    <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Ambiente</label>
+    <select name="ambiente" required
+      class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
+      <option value="">Selecione o ambiente...</option>
+      <option value="PRODUCAO">Produção</option>
+      <option value="HOMOLOGACAO">Homologação</option>
+    </select>
+
+    <!-- Rollback -->
+    <input type="text" name="rollback" placeholder="Rollback"
+      class="w-full border rounded px-3 py-2">
+
+    <!-- Autor -->
+    <input type="text" name="autor" placeholder="Autor" required
+      class="w-full border rounded px-3 py-2">
+
+    <!-- Botão de envio -->
+    <button type="submit"
+      class="bg-gradient-to-r from-primary to-blue-600 text-white w-full py-2 rounded-lg hover:scale-105 hover:shadow-lg transition">
+      Salvar Query
+    </button>
+  </form>
+`;
+
+
+const formProcessoHTML = () => `
+  <form id="processoForm" class="space-y-4 animate-fadeIn">
+    <!-- Título -->
+    <input type="text" name="titulo" placeholder="Título do processo" required
+      class="w-full border rounded px-3 py-2">
+
+    <!-- Autor -->
+    <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Autor</label>
+    <input type="text" name="autor" placeholder="Nome do autor" required
+      class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
+
+    <!-- Servidor -->
+    <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Servidor</label>
+    <select name="servidor" required
+      class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
+      <option value="">Selecione o servidor...</option>
+      <option value="CTC1">CTC1</option>
+      <option value="REAL">REAL</option>
+      <option value="SQL1">SQL1</option>
+      <option value="Venus">Venus</option>
+      <option value="Kripton">Kripton</option>
+      <option value="Miller">Miller</option>
+      <option value="Plutao">Plutão</option>
+      <option value="Azure">Azure</option>
+      <option value="Saturno">Saturno</option>
+    </select>
+
+    <!-- Data de Execução -->
+    <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Data de execução</label>
+    <input type="date" name="data_execucao" required
+      class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
+
+    <!-- Horário de Execução -->
+    <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Horário de execução</label>
+    <input type="time" name="hora_execucao" required
+      class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
+
+    <!-- Etapas -->
+    <div>
+      <label class="block font-medium text-gray-700 dark:text-gray-200">Etapas</label>
+      <div id="etapasContainer" class="space-y-2"></div>
+      <button type="button" id="addEtapa"
+        class="bg-gradient-to-r from-secondary to-green-600 text-white px-4 py-2 rounded-lg hover:scale-105 hover:shadow-md transition">
+        ➕ Adicionar Etapa
+      </button>
+    </div>
+
+    <!-- Botão de envio -->
+    <button type="submit"
+      class="bg-gradient-to-r from-primary to-blue-600 text-white w-full py-2 rounded-lg hover:scale-105 hover:shadow-lg transition">
+      Salvar Processo
+    </button>
+  </form>
+`;
+
+
+
 
     function attachFormEvents(tipo) {
       if (tipo === "query") {
