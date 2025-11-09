@@ -1,7 +1,0 @@
-ambiente: Producao
-autor: Rafael Dias
-data: '2025-10-15'
-motivo: Coleta
-query: SELECT * FROM PARAMETROS
-rollback: Não tem
-titulo: Teste3

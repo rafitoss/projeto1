@@ -1,7 +1,0 @@
-ambiente: Producao
-autor: Rafael
-data: '2025-10-15'
-motivo: Coleta
-query: SELECT * FROM LOJAS
-rollback: Nao tem
-titulo: TESTE 2

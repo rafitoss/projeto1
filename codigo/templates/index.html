@@ -3,164 +3,330 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gerenciador de Queries</title>
-  <!-- Tailwind CSS via CDN -->
+  <title>✨ Gerenciador de Queries e Processos</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563eb',
+            secondary: '#16a34a'
+          },
+          animation: {
+            gradient: 'gradient 8s ease infinite',
+            fadeIn: 'fadeIn 0.8s ease forwards',
+            glow: 'glow 2s ease-in-out infinite alternate'
+          },
+          keyframes: {
+            gradient: {
+              '0%, 100%': { backgroundPosition: '0% 50%' },
+              '50%': { backgroundPosition: '100% 50%' }
+            },
+            fadeIn: {
+              from: { opacity: '0', transform: 'translateY(10px)' },
+              to: { opacity: '1', transform: 'translateY(0)' }
+            },
+            glow: {
+              from: { textShadow: '0 0 10px #3b82f6' },
+              to: { textShadow: '0 0 25px #60a5fa' }
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-gray-50 text-gray-900">
-  <div class="container mx-auto py-10 px-4 max-w-3xl">
-    <h1 class="text-3xl font-bold text-center mb-8">Gerenciador de Queries</h1>
 
-    <!-- Abas -->
-    <div class="border-b border-gray-300 mb-6">
-      <nav class="flex space-x-4" id="menuTabs" role="tablist">
-        <button
-          id="criar-tab"
-          class="tab-btn border-b-2 border-blue-600 text-blue-600 px-4 py-2 font-medium"
-          data-target="#criar"
-          role="tab"
-        >
-          Criar Query
+<body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200 bg-[length:200%_200%] animate-gradient text-gray-800 transition-colors duration-300 relative overflow-hidden">
+
+  <!-- 🌙 Alternar modo escuro -->
+  <button id="toggleDark" class="fixed top-5 right-5 backdrop-blur-md bg-white/70 dark:bg-gray-800 dark:text-gray-100 px-3 py-1 rounded-lg shadow text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+    🌙
+  </button>
+
+  <!-- 🔐 Tela de Login -->
+  <div id="loginScreen" class="flex items-center justify-center min-h-screen animate-fadeIn">
+    <div class="backdrop-blur-md bg-white/80 dark:bg-gray-900/80 shadow-2xl rounded-3xl p-10 w-full max-w-md border border-white/30 dark:border-gray-700 transform transition-all duration-700 hover:scale-[1.02]">
+      <h2 class="text-4xl font-extrabold text-center mb-8 text-primary dark:text-blue-400 animate-glow">✨ Acesso ao Sistema</h2>
+      <form id="loginForm" class="space-y-5">
+        <div>
+          <label for="usuario" class="block font-medium mb-1">Usuário</label>
+          <input type="text" id="usuario" name="usuario" required
+            class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none">
+        </div>
+        <div>
+          <label for="senha" class="block font-medium mb-1">Senha</label>
+          <input type="password" id="senha" name="senha" required
+            class="w-full border border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800 rounded-lg px-3 py-2 focus:ring-2 focus:ring-primary focus:outline-none">
+        </div>
+        <button type="submit"
+          class="w-full bg-gradient-to-r from-primary to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
+          Entrar 🚀
         </button>
-        <button
-          id="consultar-tab"
-          class="tab-btn border-b-2 border-transparent hover:text-blue-600 hover:border-blue-600 px-4 py-2 font-medium"
-          data-target="#consultar"
-          role="tab"
-        >
-          Consultar Queries
-        </button>
-      </nav>
-    </div>
-
-    <!-- Conteúdo das abas -->
-    <div id="menuTabsContent">
-      <!-- Aba Criar -->
-      <div id="criar" class="tab-content">
-        <form id="queryForm" class="space-y-4">
-          <div>
-            <label for="titulo" class="block font-medium mb-1">Título</label>
-            <input type="text" id="titulo" name="titulo" required
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <div>
-            <label for="query" class="block font-medium mb-1">SQL</label>
-            <textarea id="query" name="query" rows="5" required
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none resize-y"></textarea>
-          </div>
-
-          <div>
-            <label for="motivo" class="block font-medium mb-1">Motivo</label>
-            <input type="text" id="motivo" name="motivo" required
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <div>
-            <label for="ambiente" class="block font-medium mb-1">Ambiente</label>
-            <input type="text" id="ambiente" name="ambiente" required
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <div>
-            <label for="rollback" class="block font-medium mb-1">Rollback</label>
-            <input type="text" id="rollback" name="rollback"
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <div>
-            <label for="autor" class="block font-medium mb-1">Autor</label>
-            <input type="text" id="autor" name="autor" required
-              class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-          </div>
-
-          <button type="submit"
-            class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition">
-            Salvar Query
-          </button>
-        </form>
-
-        <div id="msg" class="mt-4"></div>
-      </div>
-
-      <!-- Aba Consultar -->
-      <div id="consultar" class="tab-content hidden">
-        <div id="listaQueries" class="mt-4"></div>
-      </div>
+      </form>
+      <div id="loginMsg" class="mt-4 text-center text-sm"></div>
     </div>
   </div>
 
-  <!-- Script JS -->
+  <!-- 🧭 Tela de Menu Principal -->
+  <div id="menuPrincipalScreen" class="hidden flex flex-col justify-center items-center min-h-screen animate-fadeIn">
+    <h1 class="text-5xl font-extrabold text-primary mb-10 animate-glow text-center">Bem-vindo ao Sistema 💫</h1>
+    <div class="flex flex-col gap-6">
+      <button id="btnMenuQuery" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-10 py-4 rounded-2xl shadow-xl hover:scale-105 hover:shadow-[0_0_20px_#2563eb] transition-all">
+        💾 Gerenciar Queries
+      </button>
+      <button id="btnMenuProcesso" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-10 py-4 rounded-2xl shadow-xl hover:scale-105 hover:shadow-[0_0_20px_#16a34a] transition-all">
+        ⚙️ Gerenciar Processos
+      </button>
+      <button id="btnSairMenuPrincipal" class="text-red-600 hover:underline mt-6">Sair</button>
+    </div>
+  </div>
+
+  <!-- 🧭 Menu Superior -->
+  <div id="menuScreen" class="hidden bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg p-6 flex flex-col items-center sticky top-0 z-50 transition-all duration-500 border-b border-white/30 dark:border-gray-700">
+    <div class="flex gap-6 mb-3">
+      <button id="btnQuery" class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-xl shadow-md hover:scale-105 hover:shadow-[0_0_25px_#2563eb] transition">💾 Queries</button>
+      <button id="btnProcesso" class="bg-gradient-to-r from-green-500 to-green-700 text-white px-6 py-3 rounded-xl shadow-md hover:scale-105 hover:shadow-[0_0_25px_#16a34a] transition">⚙️ Processos</button>
+    </div>
+    <button id="logoutBtnMenu" class="text-red-600 hover:underline">Sair</button>
+  </div>
+
+  <!-- 💻 Conteúdo Principal -->
+  <div id="mainScreen" class="hidden container mx-auto py-10 px-4 max-w-3xl animate-fadeIn">
+    <h1 id="tituloTela" class="text-3xl font-bold text-gray-700 dark:text-gray-100 mb-6 text-center"></h1>
+    <div id="mainContent" class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl shadow-xl space-y-4 border border-white/20 dark:border-gray-700"></div>
+  </div>
+
   <script>
-    const tabs = document.querySelectorAll(".tab-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
-
-    tabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        // Mudar estilos das abas
-        tabs.forEach(t => t.classList.remove("border-blue-600", "text-blue-600"));
-        tab.classList.add("border-blue-600", "text-blue-600");
-
-        // Mostrar o conteúdo correspondente
-        tabContents.forEach(content => content.classList.add("hidden"));
-        const target = document.querySelector(tab.dataset.target);
-        target.classList.remove("hidden");
-      });
+    // 🌙 Tema escuro
+    document.getElementById("toggleDark").addEventListener("click", () => {
+      document.documentElement.classList.toggle("dark");
     });
 
-    const form = document.getElementById("queryForm");
-    const msgDiv = document.getElementById("msg");
-    const listaDiv = document.getElementById("listaQueries");
+    const loginForm = document.getElementById('loginForm');
+    const loginScreen = document.getElementById('loginScreen');
+    const menuPrincipalScreen = document.getElementById('menuPrincipalScreen');
+    const menuScreen = document.getElementById('menuScreen');
+    const mainScreen = document.getElementById('mainScreen');
+    const loginMsg = document.getElementById('loginMsg');
+    const tituloTela = document.getElementById("tituloTela");
+    const mainContent = document.getElementById("mainContent");
 
-    form.addEventListener("submit", async (e) => {
+    // LOGIN
+    loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      msgDiv.innerHTML = "";
-
-      const formData = new FormData(form);
-      const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value.trim();
-      });
-
-      const res = await fetch("/api/salvar", {
+      loginMsg.innerHTML = "";
+      const usuario = document.getElementById("usuario").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+      const res = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ usuario, senha }),
       });
-
       const json = await res.json();
       if (res.ok) {
-        msgDiv.innerHTML = `<div class="bg-green-100 text-green-700 px-4 py-2 rounded">${json.message}</div>`;
-        form.reset();
+        localStorage.setItem("logado", "true");
+        loginMsg.innerHTML = `<p class='text-green-600'>${json.message}</p>`;
+        setTimeout(() => {
+          loginScreen.classList.add("hidden");
+          menuPrincipalScreen.classList.remove("hidden");
+        }, 500);
       } else {
-        msgDiv.innerHTML = `<div class="bg-red-100 text-red-700 px-4 py-2 rounded">${json.error}</div>`;
+        loginMsg.innerHTML = `<p class='text-red-600'>${json.error}</p>`;
       }
     });
 
-    // Consultar queries
-    const consultarTab = document.getElementById("consultar-tab");
-    consultarTab.addEventListener("click", async () => {
-      listaDiv.innerHTML = "Carregando...";
-      const res = await fetch("/api/consultar");
-      const arr = await res.json();
+    // MENU
+    document.getElementById("btnMenuQuery").addEventListener("click", () => abrirTelaMenu("query"));
+    document.getElementById("btnMenuProcesso").addEventListener("click", () => abrirTelaMenu("processo"));
+    document.getElementById("btnQuery").addEventListener("click", () => abrirTela("query"));
+    document.getElementById("btnProcesso").addEventListener("click", () => abrirTela("processo"));
 
-      if (!Array.isArray(arr) || arr.length === 0) {
-        listaDiv.innerHTML = `<p class="text-gray-500">Nenhuma query cadastrada.</p>`;
-        return;
-      }
+    function abrirTelaMenu(tipo) {
+      menuPrincipalScreen.classList.add("hidden");
+      mainScreen.classList.remove("hidden");
+      menuScreen.classList.remove("hidden");
+      abrirTela(tipo);
+    }
 
-      let html = "";
-      arr.forEach(q => {
-        html += `
-          <div class="bg-white shadow rounded p-4 mb-3">
-            <h5 class="text-lg font-semibold">${q.titulo}</h5>
-            <small class="text-gray-500">${q.data} — ${q.autor} — ${q.ambiente}</small>
-            <pre class="whitespace-pre-wrap mt-2 bg-gray-100 rounded p-2">${q.query}</pre>
-          </div>
-        `;
-      });
-      listaDiv.innerHTML = html;
+    document.getElementById("btnSairMenuPrincipal").addEventListener("click", async () => {
+      await fetch("/api/logout", { method: "POST" });
+      localStorage.removeItem("logado");
+      menuPrincipalScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+      loginForm.reset();
     });
+
+    document.getElementById("logoutBtnMenu").addEventListener("click", async () => {
+      await fetch("/api/logout", { method: "POST" });
+      localStorage.removeItem("logado");
+      menuScreen.classList.add("hidden");
+      mainScreen.classList.add("hidden");
+      loginScreen.classList.remove("hidden");
+      loginForm.reset();
+    });
+
+    if (localStorage.getItem("logado") === "true") {
+      loginScreen.classList.add("hidden");
+      menuPrincipalScreen.classList.remove("hidden");
+    }
+
+    // LISTA
+    async function abrirTela(tipo) {
+      tituloTela.textContent = tipo === "query" ? "Gerenciador de Queries 💾" : "Gerenciador de Processos ⚙️";
+      mainContent.innerHTML = `
+        <div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-2 animate-fadeIn">
+          <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-100">Registros</h2>
+          <input id="searchInput" type="text" placeholder="Pesquisar..."
+            class="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-primary transition">
+          <button id="btnNovo" class="bg-gradient-to-r from-primary to-blue-600 text-white px-4 py-2 rounded-lg hover:scale-105 hover:shadow-[0_0_15px_#2563eb] transition-all duration-300">
+            ➕ Nova ${tipo === "query" ? "Query" : "Processo"}
+          </button>
+        </div>
+        <div id="listaContainer" class="flex flex-col gap-4 animate-fadeIn">
+          <p class="text-gray-500 text-center">Carregando...</p>
+        </div>
+      `;
+      document.getElementById("btnNovo").addEventListener("click", () => abrirFormulario(tipo));
+      await carregarLista(tipo);
+    }
+
+    // --- 🟩 FLAGS DE AMBIENTE ---
+    async function carregarLista(tipo) {
+      const listaContainer = document.getElementById("listaContainer");
+      const url = tipo === "query" ? "/api/consultar" : "/api/consultarp";
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        listaContainer.innerHTML = "";
+
+        if (!res.ok || !data.length) {
+          listaContainer.innerHTML = `<p class='text-gray-500 text-center'>Nenhum registro encontrado.</p>`;
+          return;
+        }
+
+        data.forEach((item, index) => {
+          const card = document.createElement("div");
+          card.className = `
+            relative bg-white/90 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-md border border-white/30 dark:border-gray-700 p-4
+            transform opacity-0 translate-y-5 transition-all duration-700 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-200/30 dark:hover:shadow-blue-700/20
+          `;
+
+          let ambiente = (item.ambiente || "").toUpperCase();
+          let badgeColor, emoji;
+          switch (ambiente) {
+            case "PRODUCAO":
+              badgeColor = "bg-red-500"; emoji = "🧱"; break;
+            case "HOMOLOGACAO":
+              badgeColor = "bg-green-500"; emoji = "🧩"; break;
+            case "DESENVOLVIMENTO":
+              badgeColor = "bg-blue-500"; emoji = "💡"; break;
+            case "TESTE":
+              badgeColor = "bg-yellow-500"; emoji = "🧪"; break;
+            default:
+              badgeColor = "bg-gray-400"; emoji = "📁";
+          }
+
+          const badgeHTML = ambiente
+            ? `<span class="absolute top-3 right-3 ${badgeColor} text-white text-xs font-semibold px-3 py-1 rounded-full shadow flex items-center gap-1">
+                ${emoji} ${ambiente}
+              </span>`
+            : "";
+
+          const campos = Object.entries(item)
+            .filter(([key]) => key.toLowerCase() !== "ambiente")
+            .map(([key, val]) => `
+              <p><span class="font-semibold text-gray-600 dark:text-gray-300">${key}:</span>
+              <span class="text-gray-800 dark:text-gray-100">${Array.isArray(val) ? val.join(", ") : val}</span></p>
+            `)
+            .join("");
+
+          card.innerHTML = badgeHTML + campos;
+          listaContainer.appendChild(card);
+          setTimeout(() => card.classList.remove("opacity-0", "translate-y-5"), index * 120);
+        });
+      } catch (err) {
+        console.error(err);
+        listaContainer.innerHTML = `<p class='text-red-600 text-center'>Erro ao carregar registros 😢</p>`;
+      }
+    }
+
+    // FORMULÁRIOS
+    function abrirFormulario(tipo) {
+      mainContent.innerHTML = `
+        <button id="voltarLista" class="mb-4 text-primary hover:underline transition transform hover:scale-105">← Voltar</button>
+        <div id="formContainer" class="opacity-0 transform translate-y-5 transition-all duration-500">
+          ${tipo === "query" ? formQueryHTML() : formProcessoHTML()}
+        </div>
+      `;
+      const formContainer = document.getElementById("formContainer");
+      setTimeout(() => formContainer.classList.remove("opacity-0", "translate-y-5"), 50);
+      document.getElementById("voltarLista").addEventListener("click", () => abrirTela(tipo));
+      attachFormEvents(tipo);
+    }
+
+    const formQueryHTML = () => `
+      <form id="queryForm" class="space-y-4 animate-fadeIn">
+        <input type="text" name="titulo" placeholder="Título" required class="w-full border rounded px-3 py-2">
+        <textarea name="query" placeholder="SQL" rows="5" required class="w-full border rounded px-3 py-2"></textarea>
+        <input type="text" name="motivo" placeholder="Motivo" required class="w-full border rounded px-3 py-2">
+        <input type="text" name="ambiente" placeholder="Ambiente" required class="w-full border rounded px-3 py-2">
+        <input type="text" name="rollback" placeholder="Rollback" class="w-full border rounded px-3 py-2">
+        <input type="text" name="autor" placeholder="Autor" required class="w-full border rounded px-3 py-2">
+        <button type="submit" class="bg-gradient-to-r from-primary to-blue-600 text-white w-full py-2 rounded-lg hover:scale-105 hover:shadow-lg transition">Salvar Query</button>
+      </form>
+    `;
+
+    const formProcessoHTML = () => `
+      <form id="processoForm" class="space-y-4 animate-fadeIn">
+        <input type="text" name="titulo" placeholder="Título" required class="w-full border rounded px-3 py-2">
+        <label class="block font-medium text-gray-700 dark:text-gray-200 mb-1">Servidor</label>
+        <select name="servidor" required class="w-full border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 dark:text-gray-100">
+          <option value="">Selecione o servidor...</option>
+          <option value="PRODUCAO">PRODUÇÃO</option>
+          <option value="HOMOLOGACAO">HOMOLOGAÇÃO</option>
+          <option value="DESENVOLVIMENTO">DESENVOLVIMENTO</option>
+          <option value="TESTE">TESTE</option>
+        </select>
+        <div>
+          <label class="block font-medium text-gray-700 dark:text-gray-200">Etapas</label>
+          <div id="etapasContainer" class="space-y-2"></div>
+          <button type="button" id="addEtapa" class="bg-gradient-to-r from-secondary to-green-600 text-white px-4 py-2 rounded-lg hover:scale-105 hover:shadow-md transition">➕ Adicionar Etapa</button>
+        </div>
+        <button type="submit" class="bg-gradient-to-r from-primary to-blue-600 text-white w-full py-2 rounded-lg hover:scale-105 hover:shadow-lg transition">Salvar Processo</button>
+      </form>
+    `;
+
+    function attachFormEvents(tipo) {
+      if (tipo === "query") {
+        document.getElementById("queryForm").addEventListener("submit", async e => {
+          e.preventDefault();
+          alert("Query salva! (implemente envio real)");
+          abrirTela("query");
+        });
+      } else {
+        const etapasContainer = document.getElementById("etapasContainer");
+        document.getElementById("addEtapa").addEventListener("click", () => {
+          const div = document.createElement("div");
+          div.className = "flex gap-2";
+          div.innerHTML = `
+            <input type="text" name="etapas[]" placeholder="Descrição da etapa" class="flex-1 border rounded px-3 py-2">
+            <button type="button" class="bg-red-500 text-white px-3 rounded hover:bg-red-600 transition">✖</button>
+          `;
+          div.querySelector("button").addEventListener("click", () => div.remove());
+          etapasContainer.appendChild(div);
+        });
+
+        document.getElementById("processoForm").addEventListener("submit", async e => {
+          e.preventDefault();
+          alert("Processo salvo! (implemente envio real)");
+          abrirTela("processo");
+        });
+      }
+    }
   </script>
 </body>
 </html>

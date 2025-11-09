@@ -1,7 +1,0 @@
-ambiente: Homologacao
-autor: Rafael Dias
-data: '2025-10-15'
-motivo: Testando
-query: SELECT * FROM PRODUTO
-rollback: n�o tem
-titulo: Teste

@@ -24,10 +24,7 @@ def listar_queries():
     return arquivos
 
 def carregar_query(nome_arquivo):
-    """
-    Carrega o conteúdo de uma query YAML.
-    Exemplo: carregar_query("minha_query.yaml")
-    """
+
     path = os.path.join(QUERIES_DIR, nome_arquivo)
     if not os.path.exists(path):
         print(f"Arquivo '{nome_arquivo}' não encontrado.")
