@@ -1,0 +1,103 @@
+/* assets/style.css */
+
+/* Cartão base */
+.card {
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.8);
+  color: inherit;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 1.5rem;
+  padding: 2.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Título */
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2563eb;
+}
+
+/* Label */
+.label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+/* Input */
+.input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(249, 250, 251, 0.5);
+}
+
+.input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #2563eb;
+}
+
+/* Botões */
+.btn-primary {
+  background: linear-gradient(to right, #2563eb, #1e40af);
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.5);
+}
+
+/* Botões de menu */
+.btn-menu {
+  display: block;
+  text-align: center;
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-menu:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Menu superior */
+.menu-topo {
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(12px);
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Botão de modo escuro */
+.toggle-dark {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.toggle-dark:hover {
+  transform: scale(1.05);
+  background-color: rgba(229, 231, 235, 0.9);
+}
