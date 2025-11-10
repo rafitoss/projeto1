@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>✨ Login | Gerenciador</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen flex items-center justify-center">
+
+  <!-- 🌙 Botão de tema -->
+  <button id="toggleDark" class="toggle-dark">🌙</button>
+
+  <!-- 🔐 Login -->
+  <div class="card w-full max-w-md">
+    <h1 class="title">✨ Acesso ao Sistema</h1>
+    <form id="loginForm" class="space-y-5">
+      <div>
+        <label class="label">Usuário</label>
+        <input type="text" id="usuario" class="input" required>
+      </div>
+      <div>
+        <label class="label">Senha</label>
+        <input type="password" id="senha" class="input" required>
+      </div>
+      <button type="submit" class="btn-primary w-full">Entrar 🚀</button>
+      <p id="loginMsg" class="text-center text-sm mt-2"></p>
+    </form>
+  </div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
