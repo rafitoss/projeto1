@@ -39,6 +39,7 @@
   </script>
 </head>
 
+
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-100 to-blue-200 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 bg-[length:200%_200%] animate-gradient text-gray-800 dark:text-gray-100 transition-colors duration-300 relative overflow-hidden">
 
 <!-- 🌙 Alternar modo escuro (sempre visível em todas as telas) -->
@@ -95,11 +96,17 @@
     <button id="logoutBtnMenu" class="text-red-600 hover:underline">Sair</button>
   </div>
 
-  <!-- 💻 Conteúdo Principal -->
-  <div id="mainScreen" class="hidden container mx-auto py-10 px-4 max-w-3xl animate-fadeIn">
-    <h1 id="tituloTela" class="text-3xl font-bold text-gray-700 dark:text-gray-100 mb-6 text-center"></h1>
-    <div id="mainContent" class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl shadow-xl space-y-4 border border-white/20 dark:border-gray-700"></div>
+<!-- 💻 Conteúdo Principal -->
+<div id="mainScreen" class="hidden w-full max-w-[95vw] mx-auto py-10 px-6 animate-fadeIn">
+  <h1 id="tituloTela" class="text-3xl font-bold text-gray-700 dark:text-gray-100 mb-6 text-center"></h1>
+  <div id="mainContent" class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md p-6 rounded-2xl shadow-xl space-y-4 border border-white/20 dark:border-gray-700
+      max-h-[85vh] overflow-y-auto w-full">
   </div>
+</div>
+
+
+
+
 
   <script>
     // 🌙 Tema escuro com persistência
@@ -207,6 +214,57 @@
       await carregarLista(tipo);
     }
 
+    // 🔹 ABRIR ARQUIVO EXISTENTE
+async function abrirArquivo(tipo, nomeArquivo) {
+  const url = tipo === "query" 
+    ? `/api/abrir_query/${encodeURIComponent(nomeArquivo)}`
+    : `/api/abrir_processo/${encodeURIComponent(nomeArquivo)}`;
+
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!res.ok) { alert(data.error); return; }
+
+    mainContent.innerHTML = `
+      <button id="voltarLista" class="mb-4 text-primary hover:underline transition transform hover:scale-105">← Voltar</button>
+      <div id="formContainer" class="opacity-0 transform translate-y-5 transition-all duration-500">
+        ${tipo === "query" ? formQueryHTML() : formProcessoHTML()}
+      </div>
+    `;
+    const formContainer = document.getElementById("formContainer");
+    setTimeout(() => formContainer.classList.remove("opacity-0", "translate-y-5"), 50);
+    document.getElementById("voltarLista").addEventListener("click", () => abrirTela(tipo));
+
+    const formEl = tipo === "query" ? document.getElementById("queryForm") : document.getElementById("processoForm");
+
+    // Preencher formulário com os dados do arquivo
+    for(const [key, val] of Object.entries(data)){
+      if(key === "etapas" && tipo === "processo"){
+        const etapasContainer = document.getElementById("etapasContainer");
+        etapasContainer.innerHTML = "";
+        val.forEach(etapa => {
+          const div = document.createElement("div");
+          div.className = "flex gap-2";
+          div.innerHTML = `
+            <input type="text" name="etapas[]" class="flex-1 border rounded px-3 py-2" value="${etapa}">
+            <button type="button" class="bg-red-500 text-white px-3 rounded hover:bg-red-600 transition">✖</button>
+          `;
+          div.querySelector("button").addEventListener("click", () => div.remove());
+          etapasContainer.appendChild(div);
+        });
+      } else if(formEl[key]){
+        formEl[key].value = val;
+      }
+    }
+
+    attachFormEvents(tipo); // Reanexa eventos de submit
+  } catch(err){
+    console.error(err);
+    alert("Erro ao abrir arquivo 😢");
+  }
+}
+
+
     // --- 🟩 FLAGS DE AMBIENTE ---
     async function carregarLista(tipo) {
       const listaContainer = document.getElementById("listaContainer");
@@ -223,45 +281,84 @@
         }
 
         data.forEach((item, index) => {
-          const card = document.createElement("div");
-          card.className = `
-            relative bg-white/90 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-md border border-white/30 dark:border-gray-700 p-4
-            transform opacity-0 translate-y-5 transition-all duration-700 hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-200/30 dark:hover:shadow-blue-700/20
-          `;
+  const card = document.createElement("div");
+card.className = `
+  relative bg-white/90 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-md border border-white/30 dark:border-gray-700
+  p-4 w-full max-w-[90%] mx-auto
+  transform opacity-0 translate-y-5 transition-all duration-700
+  hover:scale-[1.02] hover:shadow-xl hover:shadow-blue-200/30 dark:hover:shadow-blue-700/20
+`;
 
-          let ambiente = (item.ambiente || "").toUpperCase();
-          let badgeColor, emoji;
-          switch (ambiente) {
-            case "PRODUCAO":
-              badgeColor = "bg-red-500"; emoji = "🧱"; break;
-            case "HOMOLOGACAO":
-              badgeColor = "bg-green-500"; emoji = "🧩"; break;
-            case "DESENVOLVIMENTO":
-              badgeColor = "bg-blue-500"; emoji = "💡"; break;
-            case "TESTE":
-              badgeColor = "bg-yellow-500"; emoji = "🧪"; break;
-            default:
-              badgeColor = "bg-gray-400"; emoji = "📁";
-          }
 
-          const badgeHTML = ambiente
-            ? `<span class="absolute top-3 right-3 ${badgeColor} text-white text-xs font-semibold px-3 py-1 rounded-full shadow flex items-center gap-1">
-                ${emoji} ${ambiente}
-              </span>`
-            : "";
+  // --- Badge de ambiente ---
+  let ambiente = (item.ambiente || "").toUpperCase();
+  let badgeColor, emoji;
+  switch (ambiente) {
+    case "PRODUCAO": badgeColor = "bg-red-500"; emoji = "🧱"; break;
+    case "HOMOLOGACAO": badgeColor = "bg-green-500"; emoji = "🧩"; break;
+    case "DESENVOLVIMENTO": badgeColor = "bg-blue-500"; emoji = "💡"; break;
+    case "TESTE": badgeColor = "bg-yellow-500"; emoji = "🧪"; break;
+    default: badgeColor = "bg-gray-400"; emoji = "📁";
+  }
+  const badgeHTML = ambiente
+    ? `<span class="absolute top-3 right-3 ${badgeColor} text-white text-xs font-semibold px-3 py-1 rounded-full shadow flex items-center gap-1">
+        ${emoji} ${ambiente}
+      </span>`
+    : "";
 
-          const campos = Object.entries(item)
-            .filter(([key]) => key.toLowerCase() !== "ambiente")
-            .map(([key, val]) => `
-              <p><span class="font-semibold text-gray-600 dark:text-gray-300">${key}:</span>
-              <span class="text-gray-800 dark:text-gray-100">${Array.isArray(val) ? val.join(", ") : val}</span></p>
-            `)
-            .join("");
+  // --- Campos da query/processo ---
+  const campos = Object.entries(item)
+    .filter(([key]) => key.toLowerCase() !== "ambiente")
+    .map(([key, val]) => `
+      <p><span class="font-semibold text-gray-600 dark:text-gray-300">${key}:</span>
+      <span class="text-gray-800 dark:text-gray-100">${Array.isArray(val) ? val.join(", ") : val}</span></p>
+    `)
+    .join("");
 
-          card.innerHTML = badgeHTML + campos;
-          listaContainer.appendChild(card);
-          setTimeout(() => card.classList.remove("opacity-0", "translate-y-5"), index * 120);
-        });
+// --- Menu de ações ---
+const actionsHTML = `
+  <div class="actionsMenu hidden mt-2 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-1">
+    <button class="editAction w-full text-left px-3 py-1 hover:bg-gray-100 dark:hover:bg-gray-700 transition">✏️ Editar</button>
+    <button class="deleteAction w-full text-left px-3 py-1 hover:bg-red-500 hover:text-white transition">🗑️ Apagar</button>
+  </div>
+`;
+
+card.innerHTML = badgeHTML + actionsHTML + campos;
+
+const actionsMenu = card.querySelector(".actionsMenu");
+
+  // --- Editar ---
+  const editBtn = card.querySelector(".editAction");
+  editBtn.addEventListener("click", () => {
+    abrirFormularioComDados(tipo, item);
+    actionsMenu.classList.add("hidden");
+  });
+
+  // --- Apagar ---
+  const deleteBtn = card.querySelector(".deleteAction");
+  deleteBtn.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    if (!confirm("Deseja realmente apagar este arquivo?")) return;
+
+    const arquivo = item.titulo.replace(/ /g, "_").toLowerCase() + ".yaml";
+    const res = await fetch(`/api/apagar_query/${arquivo}`, { method: "DELETE" });
+    const json = await res.json();
+
+    if (res.ok) {
+      alert("Arquivo apagado com sucesso!");
+      carregarLista(tipo);
+    } else {
+      alert("Erro ao apagar: " + json.error);
+    }
+  });
+
+  // --- Clique no card abre formulário ---
+  card.addEventListener("click", () => abrirFormularioComDados(tipo, item));
+
+  listaContainer.appendChild(card);
+  setTimeout(() => card.classList.remove("opacity-0", "translate-y-5"), index * 120);
+});
+
       } catch (err) {
         console.error(err);
         listaContainer.innerHTML = `<p class='text-red-600 text-center'>Erro ao carregar registros 😢</p>`;
@@ -281,6 +378,94 @@
       document.getElementById("voltarLista").addEventListener("click", () => abrirTela(tipo));
       attachFormEvents(tipo);
     }
+
+   
+    async function abrirFormularioComDados(tipo, item) {
+  // Cria overlay full-screen
+  const overlay = document.createElement("div");
+  overlay.id = "formOverlay";
+  overlay.className = `
+    fixed top-0 left-0 w-full h-full bg-black/30 dark:bg-black/40 z-50 flex justify-center items-start pt-24 overflow-y-auto
+    opacity-0 scale-95 transition-all duration-300
+  `;
+
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.remove("opacity-0", "scale-95"), 50);
+
+  // Cria card centralizado
+const card = document.createElement("div");
+card.className = `
+  bg-white/90 dark:bg-gray-800/80 backdrop-blur-md rounded-2xl shadow-2xl border border-white/30 dark:border-gray-700
+  p-6 w-[95vw] max-w-[95vw] mx-auto overflow-x-auto whitespace-pre-wrap animate-fadeIn
+`;
+
+
+
+
+  // Título
+  const titulo = document.createElement("h2");
+  titulo.className = "text-3xl font-bold text-gray-800 dark:text-gray-100 text-center mb-6";
+  titulo.textContent = item.titulo || "Sem título";
+  card.appendChild(titulo);
+
+  // Lista de campos
+  const ul = document.createElement("ul");
+  ul.className = "list-disc list-inside space-y-2 text-gray-700 dark:text-gray-200";
+  Object.entries(item).forEach(([key, val]) => {
+    if (key.toLowerCase() === "titulo") return;
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="font-semibold capitalize">${key}:</span> ${
+      Array.isArray(val)
+        ? `<ul class="list-decimal list-inside ml-4 space-y-1">${val.map(v => `<li>${v}</li>`).join('')}</ul>`
+        : val
+    }`;
+    ul.appendChild(li);
+  });
+  card.appendChild(ul);
+
+  // Botões de ação
+  const actions = document.createElement("div");
+  actions.className = "mt-6 flex justify-end gap-3";
+
+  const btnEditar = document.createElement("button");
+  btnEditar.className = "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition";
+  btnEditar.textContent = "✏️ Editar";
+  btnEditar.addEventListener("click", () => {
+    overlay.remove();
+    abrirFormulario(tipo);
+  });
+
+  const btnApagar = document.createElement("button");
+  btnApagar.className = "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition";
+  btnApagar.textContent = "🗑️ Apagar";
+  btnApagar.addEventListener("click", async () => {
+    if (!confirm(`Deseja realmente apagar "${item.titulo}"?`)) return;
+    const arquivo = item.titulo.replace(/ /g, "_").toLowerCase() + ".yaml";
+    const res = await fetch(`/api/apagar_query/${arquivo}`, { method: "DELETE" });
+    const json = await res.json();
+    if (res.ok) {
+      alert("Arquivo apagado com sucesso!");
+      overlay.remove();
+      abrirTela(tipo);
+    } else {
+      alert("Erro ao apagar: " + json.error);
+    }
+  });
+
+  actions.appendChild(btnEditar);
+  actions.appendChild(btnApagar);
+  card.appendChild(actions);
+
+  overlay.appendChild(card);
+
+  // Fecha overlay ao clicar fora do card
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+
+
 
 const formQueryHTML = () => `
   <form id="queryForm" class="space-y-4 animate-fadeIn">

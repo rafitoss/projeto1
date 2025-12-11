@@ -1,6 +1,7 @@
+import os
 from flask import Flask, request, jsonify, render_template, session
 from datetime import datetime
-from queries import salvar_query, listar_queries, carregar_query
+from queries import salvar_query, listar_queries, carregar_query, QUERIES_DIR
 from processo import salvar_processo, listar_processos, carregar_processo, criar_processo_interativo
 
 app = Flask(__name__)
@@ -108,11 +109,42 @@ def api_consultarp():
     return jsonify(processo)
 
 
+@app.route("/api/apagar_query/<arquivo>", methods=["DELETE"])
+def api_apagar_query(arquivo):
+    if "usuario" not in session:
+        return jsonify({"error": "Não autenticado"}), 403
+
+    path = os.path.join(QUERIES_DIR, arquivo)
+    if not os.path.exists(path):
+        return jsonify({"error": "Arquivo não encontrado"}), 404
+
+    try:
+        os.remove(path)
+        return jsonify({"message": f"Arquivo '{arquivo}' apagado com sucesso!"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
 
 
 
+@app.route("/api/abrir_query/<arquivo>")
+def api_abrir_query(arquivo):
+    if "usuario" not in session:
+        return jsonify({"error": "Não autenticado"}), 403
+
+    from queries import carregar_query
+
+    data = carregar_query(arquivo)
+    if not data:
+        return jsonify({"error": "Arquivo não encontrado"}), 404
+
+    return jsonify(data)
 
 
 
