@@ -387,7 +387,7 @@ const actionsMenu = card.querySelector(".actionsMenu");
     }
 
     // FORMULÁRIOS
-    function abrirFormulario(tipo) {
+      function abrirFormulario(tipo, dados = null) {
       mainContent.innerHTML = `
         <button id="voltarLista" class="mb-4 text-primary hover:underline transition transform hover:scale-105">← Voltar</button>
         <div id="formContainer" class="opacity-0 transform translate-y-5 transition-all duration-500">
@@ -398,6 +398,22 @@ const actionsMenu = card.querySelector(".actionsMenu");
       setTimeout(() => formContainer.classList.remove("opacity-0", "translate-y-5"), 50);
       document.getElementById("voltarLista").addEventListener("click", () => abrirTela(tipo));
       attachFormEvents(tipo);
+      // 🔹 Se estiver editando, preencher formulário
+if (dados) {
+  const form =
+    tipo === "query"
+      ? document.getElementById("queryForm")
+      : document.getElementById("processoForm");
+
+  Object.entries(dados).forEach(([key, val]) => {
+    if (!form[key]) return;
+
+    if (Array.isArray(val)) return; // processos tratados separadamente
+
+    form[key].value = val;
+  });
+}
+
     }
 
    
@@ -457,9 +473,10 @@ card.className = `
   btnEditar.className = "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition";
   btnEditar.textContent = "✏️ Editar";
   btnEditar.addEventListener("click", () => {
-    overlay.remove();
-    abrirFormulario(tipo);
-  });
+  overlay.remove();
+  abrirFormulario(tipo, item); // passa os dados
+});
+
 
   const btnApagar = document.createElement("button");
   btnApagar.className = "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition";
@@ -495,6 +512,7 @@ overlay.addEventListener("click", (e) => {
 });
 
 }
+
 
 
 
@@ -599,11 +617,21 @@ const formProcessoHTML = () => `
 
 function attachFormEvents(tipo) {
   if (tipo === "query") {
-    document.getElementById("queryForm").addEventListener("submit", async e => {
-      e.preventDefault();
+    const form = document.getElementById("queryForm");
 
-      // Pega os dados do formulário
-      const formData = Object.fromEntries(new FormData(e.target).entries());
+    // Auto-expand textarea SQL
+    const queryTextarea = form.querySelector("textarea[name='query']");
+    function autoExpand() {
+      queryTextarea.style.height = 'auto';
+      queryTextarea.style.height = queryTextarea.scrollHeight + 'px';
+    }
+    queryTextarea.addEventListener("input", autoExpand);
+    autoExpand(); // ajusta altura inicial se houver conteúdo (edição)
+
+    // Envio do formulário
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(form).entries());
 
       try {
         const res = await fetch("/api/salvar", {
@@ -625,7 +653,7 @@ function attachFormEvents(tipo) {
       }
     });
   } else {
-    // Adiciona etapa dinamicamente
+    // Processo: adicionar etapa dinamicamente
     const etapasContainer = document.getElementById("etapasContainer");
     document.getElementById("addEtapa").addEventListener("click", () => {
       const div = document.createElement("div");
@@ -638,13 +666,12 @@ function attachFormEvents(tipo) {
       etapasContainer.appendChild(div);
     });
 
-    // Envio real do formulário de processo
-    document.getElementById("processoForm").addEventListener("submit", async e => {
+    // Envio do formulário de processo
+    const form = document.getElementById("processoForm");
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-
-      // Pega etapas como array
       const etapas = [...document.querySelectorAll("input[name='etapas[]']")].map(i => i.value);
-      const formData = Object.fromEntries(new FormData(e.target).entries());
+      const formData = Object.fromEntries(new FormData(form).entries());
       formData.etapas = etapas;
 
       try {
