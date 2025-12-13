@@ -37,6 +37,27 @@
       }
     }
   </script>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/sql.min.js"></script>
+
+
+<style>
+  /* 🌞 Modo claro: SQL em preto */
+  html:not(.dark) pre code.hljs,
+  html:not(.dark) .hljs {
+    color: #3d3b3b !important;
+  }
+
+  /* Mantém fundo transparente */
+  pre code.hljs {
+    background: transparent !important;
+  }
+</style>
+
 </head>
 
 
@@ -417,7 +438,12 @@ card.className = `
     li.innerHTML = `<span class="font-semibold capitalize">${key}:</span> ${
       Array.isArray(val)
         ? `<ul class="list-decimal list-inside ml-4 space-y-1">${val.map(v => `<li>${v}</li>`).join('')}</ul>`
+        : key === "query"
+        ? `<pre class="rounded-lg"><code class="language-sql">${val
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")}</code></pre>`
         : val
+
     }`;
     ul.appendChild(li);
   });
@@ -456,12 +482,18 @@ card.className = `
   actions.appendChild(btnApagar);
   card.appendChild(actions);
 
-  overlay.appendChild(card);
+overlay.appendChild(card);
 
-  // Fecha overlay ao clicar fora do card
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) overlay.remove();
-  });
+// 🔹 ATIVA CORES DO SQL SALVO
+if (window.hljs) {
+  hljs.highlightAll();
+}
+
+// Fecha overlay ao clicar fora do card
+overlay.addEventListener("click", (e) => {
+  if (e.target === overlay) overlay.remove();
+});
+
 }
 
 
